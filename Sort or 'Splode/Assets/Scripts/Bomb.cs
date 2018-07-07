@@ -7,10 +7,14 @@ public class Bomb : MonoBehaviour
     private float _speed;
     private bool _dragging;
     private Vector3 _offset;
+    private bool _sorted;
+    private bool _inside;
 
     void Start ()
     {
         _speed = 1;
+        _sorted = false;
+        _inside = false;
         RigidBody.velocity = new Vector2(_speed, _speed);
     }
 
@@ -27,6 +31,11 @@ public class Bomb : MonoBehaviour
     private void OnMouseUp()
     {
         _dragging = false;
+
+        if (_inside)
+        {
+            _sorted = true;
+        }
     }
 
     private void OnMouseDrag()
@@ -35,11 +44,21 @@ public class Bomb : MonoBehaviour
         RigidBody.MovePosition(Camera.main.ScreenToWorldPoint(newPosition) + _offset);
     }
 
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        _inside = true;
+    }
+
+    public void OnTriggerExit2D(Collider2D collision)
+    {
+        _inside = false;
+    }
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
         // When the bomb hits a wall
-        if (!_dragging)
+        if ((!_dragging && collision.gameObject.tag == "OutsideCollider") ||
+            (_sorted && collision.gameObject.tag == "InsideCollider"))
         {
             var normal = collision.contacts[0].normal;
             RigidBody.velocity = Vector3.Reflect(RigidBody.velocity, normal);
