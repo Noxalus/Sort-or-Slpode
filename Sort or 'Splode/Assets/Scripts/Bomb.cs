@@ -1,8 +1,16 @@
 ﻿using UnityEngine;
 
+public enum BombType
+{
+    Black,
+    Red
+}
+
 public class Bomb : MonoBehaviour
 {
     public Rigidbody2D RigidBody;
+    public ParticleSystem ParticleEffect;
+    public BombType BombType;
 
     private float _speed;
     private bool _dragging;
@@ -15,7 +23,6 @@ public class Bomb : MonoBehaviour
         _speed = 1;
         _sorted = false;
         _inside = false;
-        RigidBody.velocity = new Vector2(_speed, _speed);
     }
 
 	void Update ()
@@ -24,6 +31,9 @@ public class Bomb : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (_sorted)
+            return;
+
         _dragging = true;
         _offset = transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, 10.0f));
     }
@@ -31,11 +41,17 @@ public class Bomb : MonoBehaviour
     private void OnMouseUp()
     {
         _dragging = false;
+        _sorted = _inside;
 
-        if (_inside)
+        if (_sorted)
         {
-            _sorted = true;
+            OnSorted();
         }
+    }
+
+    private void OnSorted()
+    {
+        ParticleEffect.Stop();
     }
 
     private void OnMouseDrag()

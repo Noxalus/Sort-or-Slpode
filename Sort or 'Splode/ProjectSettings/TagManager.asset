@@ -43,3 +43,6 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Bomb
+    uniqueID: 2302634015
+    locked: 0
