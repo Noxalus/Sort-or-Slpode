@@ -8,7 +8,7 @@ public class Bomb : MonoBehaviour
 
 	void Start ()
     {
-        _speed = 5;
+        _speed = 1;
         RigidBody.velocity = new Vector2(_speed, _speed);
     }
 
