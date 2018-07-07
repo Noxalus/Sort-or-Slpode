@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public enum BombType
 {
@@ -9,25 +10,47 @@ public enum BombType
 public class Bomb : MonoBehaviour
 {
     public Rigidbody2D RigidBody;
-    public ParticleSystem ParticleEffect;
+    public ParticleSystem WickParticleEffect;
+    public ParticleSystem ExplosionParticleEffect;
     public BombType BombType;
+    public float SecondsToExplode;
 
-    private float _speed;
     private bool _dragging;
     private Vector3 _offset;
     private bool _sorted;
     private bool _inside;
+    private bool _wrongSort;
+    private float _startTimer;
 
     void Start ()
     {
-        _speed = 1;
         _sorted = false;
         _inside = false;
+        _wrongSort = false;
+
+        ExplosionParticleEffect.gameObject.SetActive(false);
+        _startTimer = Time.time;
     }
 
 	void Update ()
     {
+        if (!_sorted && Time.time > _startTimer + SecondsToExplode)
+        {
+            ExplosionParticleEffect.gameObject.SetActive(true);
+            LaunchExplosionAnimation();
+        }
 	}
+
+    private void LaunchExplosionAnimation()
+    {
+        StartCoroutine(DestroyBomb());
+    }
+
+    private IEnumerator DestroyBomb()
+    {
+        yield return new WaitForSeconds(1);
+        Destroy(gameObject);
+    }
 
     private void OnMouseDown()
     {
@@ -51,7 +74,7 @@ public class Bomb : MonoBehaviour
 
     private void OnSorted()
     {
-        ParticleEffect.Stop();
+        ExplosionParticleEffect.Stop();
     }
 
     private void OnMouseDrag()
